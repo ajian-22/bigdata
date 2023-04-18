@@ -1,0 +1,6 @@
+package structuredstreaming
+
+object KafkaDemo {
+
+
+}

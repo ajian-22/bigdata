@@ -1,0 +1,4 @@
+hello java hello scala
+你好 java 你好 scala
+nihao java nihao scala
+你好

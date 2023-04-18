@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>bigdata</artifactId>
+        <groupId>com.gupao.edu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spark</artifactId>
+
+    <properties>
+        <spark.version>3.0.0</spark.version>
+        <hdfs.version>3.2</hdfs.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <!--            <scope>provided</scope>-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-graphx_${scala.lib}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-mllib_${scala.lib}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hankcs</groupId>
+            <artifactId>hanlp</artifactId>
+            <version>portable-1.8.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_${scala.lib}</artifactId>
+            <version>${spark.version}</version>
+            <!--            <scope>provided</scope>-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_${scala.lib}</artifactId>
+            <version>${spark.version}</version>
+            <!--            <scope>provided</scope>-->
+        </dependency>
+
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.hadoop</groupId>-->
+        <!--            <artifactId>hadoop-client</artifactId>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>com.fasterxml.jackson.core</groupId>-->
+        <!--                    <artifactId>*</artifactId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>com.fasterxml.jackson.module</groupId>-->
+        <!--                    <artifactId>*</artifactId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--            <version>3.0.3</version>-->
+        <!--&lt;!&ndash;            <scope>provided</scope>&ndash;&gt;-->
+        <!--        </dependency>-->
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-hive -->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.spark</groupId>-->
+        <!--            <artifactId>spark-hive_2.11</artifactId>-->
+        <!--            <version>${spark.version}</version>-->
+        <!--            <scope>provided</scope>-->
+        <!--        </dependency>-->
+
+    </dependencies>
+
+    <build>
+        <!--scala待编译的文件目录-->
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <!--testSourceDirectory>src/test/scala</testSourceDirectory-->
+        <!--scala插件-->
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>3.2.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <args>
+                                <!--<arg>-make:transitive</arg>--><!--scala2.11 netbean不支持这个参数-->
+                                <arg>-dependencyfile</arg>
+                                <arg>${project.build.directory}/.scala_dependencies</arg>
+                            </args>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--manven打包插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <!--<artifactSet>-->
+                            <!--<includes>-->
+                            <!--<include>com.alibaba:fastjson*</include>-->
+                            <!--</includes>-->
+                            <!--</artifactSet>-->
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>reference.conf</resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>sparkcore.SparkWordCount3</mainClass> <!--main方法-->
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
